@@ -10,34 +10,54 @@ This plugin also contains images to implement for ordering.
 Installation
 ------------
 
-  * Install the plugin
+### With git
 
-        $ symfony plugin:install csDoctrineActAsSortablePlugin
+    git submodule add git://github.com/bshaffer/csDoctrineActAsSortablePlugin.git plugins/csDoctrineActAsSortablePlugin
+    git submodule init
+    git submodule update
 
-  * Apply the behavior to your model in your schema file `config/doctrine/schema.yml`, ie:
+### With subversion
 
-        [yml]
-        model:
-          actAs: [Sortable]
-    Optionally accepts a UniqueBy attribute which will be used on a model with a one-to-many relationship
+    svn propedit svn:externals plugins
+
+In the editor that's displayed, add the following entry and then save
+
+    csDoctrineActAsSortablePlugin https://svn.github.com/bshaffer/csDoctrineActAsSortablePlugin.git
+
+Finally, update:
+
+    svn up
+
+# Setup
+
+In your `config/ProjectConfiguration.class.php` file, make sure you have
+the plugin enabled.
+
+    $this->enablePlugins('csDoctrineActAsSortablePlugin');
+
+Apply the behavior to your model in your schema file `config/doctrine/schema.yml`
+
+    MyModel:
+      actAs: [Sortable]
+
+Optionally accepts a UniqueBy attribute which will be used on a model with a one-to-many relationship
     
-          model:
-            actAs: [Sortable]
-            uniqueBy: [parent_id]
+    MyModel:
+      actAs:    
+        Sortable:
+          uniqueBy: [parent_id]
 
-  * Rebuild your models and database
+Rebuild your models and database
   
-        $ symfony doctrine:build-all-reload
+    ./symfony doctrine:build-all-reload
     
-    alternatively you could build the models, the sql, then run the sql manually
-        
-  * Publish your assets
+Publish your assets
 
-        $ symfony plugin:publish-assets
+    ./symfony plugin:publish-assets
 
-  * Clear your cache
+Clear your cache
 
-        $ symfony cc
+    ./symfony cc
 
 
 Available Record Methods
@@ -45,27 +65,22 @@ Available Record Methods
 
   * promote
 
-        [php]
         $record->promote();
       
   * demote
   
-        [php]
         $record->demote();
       
   * moveToFirst
   
-        [php]
         $record->moveToFirst();
       
   * moveToLast
   
-        [php]
         $record->moveToLast();
       
   * moveToPosition
   
-        [php]
         $record->moveToPosition($newPosition);
         
 
@@ -74,17 +89,14 @@ Available Table Methods
 
   * sort - accepts the array created by the symfony/prototype sortableElement tag
 
-        [php]
         Doctrine::getTable('Model')->sort($order);
 
   * findAllSorted - Accepts sort order (asc, desc)
 
-        [php]
         Doctrine::getTable('Model')->findAllSorted('ASCENDING');
 
   * findAllSortedWithParent - accepts the parent column name, the value, and sort order (asc, desc)
 
-        [php]
         Doctrine::getTable('Model')->findAllSortedWithParent($fk_value, $fk_name, 'ASCENDING');
 
 
@@ -93,7 +105,6 @@ Example Usage With Admin Generator
 
   * In your module, edit `config/generator.yml`, and under list, object actions, add:
 
-        [yml]
         object_actions:
           promote:
             action: promote
@@ -102,9 +113,8 @@ Example Usage With Admin Generator
           _edit:        -
           _delete:      -
           
-  * In your module, edit ``, Add the following actions:
+  * In your module, edit `actions/actions.class.php`, Add the following actions:
   
-        [php]
         public function executePromote()
         {
           $object=Doctrine::getTable('MyModel')->findOneById($this->getRequestParameter('id'));
