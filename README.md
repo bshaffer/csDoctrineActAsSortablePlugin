@@ -49,7 +49,7 @@ Optionally accepts a UniqueBy attribute which will be used on a model with a one
 
 Rebuild your models and database
   
-    ./symfony doctrine:build-all-reload
+    ./symfony doctrine:build --all --and-load
     
 Publish your assets
 
@@ -60,74 +60,71 @@ Clear your cache
     ./symfony cc
 
 
-Available Record Methods
-------------------------
+#Available Record Methods
 
-  * promote
+  * **promote**
 
         $record->promote();
       
-  * demote
+  * **demote**
   
         $record->demote();
       
-  * moveToFirst
+  * **moveToFirst**
   
         $record->moveToFirst();
       
-  * moveToLast
+  * **moveToLast**
   
         $record->moveToLast();
       
-  * moveToPosition
+  * **moveToPosition**
   
         $record->moveToPosition($newPosition);
         
 
-Available Table Methods
-------------------------
+#Available Table Methods
 
-  * sort - accepts the array created by the symfony/prototype sortableElement tag
+  * **sort** - accepts the array created by the symfony/prototype sortableElement tag
 
-        Doctrine::getTable('Model')->sort($order);
+        Doctrine::getTable('MyModel')->sort($order);
 
-  * findAllSorted - Accepts sort order (asc, desc)
+  * **findAllSorted** - Accepts sort order (asc, desc)
 
-        Doctrine::getTable('Model')->findAllSorted('ASCENDING');
+        Doctrine::getTable('Model')->findAllSorted('asc');
 
-  * findAllSortedWithParent - accepts the parent column name, the value, and sort order (asc, desc)
+  * **findAllSortedWithParent** - accepts the parent column name, the value, and sort order (asc, desc)
 
-        Doctrine::getTable('Model')->findAllSortedWithParent($fk_value, $fk_name, 'ASCENDING');
+        Doctrine::getTable('MyModel')->findAllSortedWithParent($fk_value, $fk_name, 'asc');
 
 
-Example Usage With Admin Generator
-----------------------------------
+#Example Usage With Admin Generator
 
-  * In your module, edit `config/generator.yml`, and under list, object actions, add:
+In your module, edit `config/generator.yml`, and under list, object actions, add:
 
-        object_actions:
-          promote:
-            action: promote
-          demote:
-            action: demote
-          _edit:        -
-          _delete:      -
+    object_actions:
+      promote:
+        action: promote
+      demote:
+        action: demote
+      _edit:        -
+      _delete:      -
           
-  * In your module, edit `actions/actions.class.php`, Add the following actions:
+In your module, edit `actions/actions.class.php`, Add the following actions:
   
-        public function executePromote()
-        {
-          $object=Doctrine::getTable('MyModel')->findOneById($this->getRequestParameter('id'));
+    public function executePromote()
+    {
+      $object=Doctrine::getTable('MyModel')->findOneById($this->getRequestParameter('id'));
 
 
-          $object->promote();
-          $this->redirect("@moduleIndexRoute");
-        }
+      $object->promote();
+      $this->redirect("@moduleIndexRoute");
+    }
 
-        public function executeDemote()
-        {
-          $object=Doctrine::getTable('MyModel')->findOneById($this->getRequestParameter('id'));
+    public function executeDemote()
+    {
+      $object=Doctrine::getTable('MyModel')->findOneById($this->getRequestParameter('id'));
 
-          $object->demote();
-          $this->redirect("@moduleIndexRoute");
-        }
+      $object->demote();
+      $this->redirect("@moduleIndexRoute");
+    }
