@@ -181,8 +181,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
                               ->update(get_class($object))
                               ->set($this->_options['name'], $this->_options['name'] . ' + 1')
                               ->where($this->_options['name'] . ' < ?', $position)
-                              ->andWhere($this->_options['name'] . ' >= ?', $newPosition)
-                              ->orderBy($this->_options['name'] . ' DESC');
+                              ->andWhere($this->_options['name'] . ' >= ?', $newPosition);
 
       foreach ($this->_options['uniqueBy'] as $field)
       {
@@ -198,8 +197,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
                               ->update(get_class($object))
                               ->set($this->_options['name'], $this->_options['name'] . ' - 1')
                               ->where($this->_options['name'] . ' > ?', $position)
-                              ->andWhere($this->_options['name'] . ' <= ?', $newPosition)
-                              ->orderBy($this->_options['name'] . ' ASC');
+                              ->andWhere($this->_options['name'] . ' <= ?', $newPosition);
 
       foreach($this->_options['uniqueBy'] as $field)
       {
