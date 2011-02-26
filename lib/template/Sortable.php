@@ -59,40 +59,40 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
     $this->hasColumn($name, $this->_options['type'], $this->_options['length'], $this->_options['options']);
 
-    if (!empty($this->_options['uniqueBy']) && !is_array($this->_options['uniqueBy'])) 
+    if (!empty($this->_options['uniqueBy']) && !is_array($this->_options['uniqueBy']))
     {
       throw new sfException("Sortable option 'uniqueBy' must be an array");
     }
-    
+
     if ($this->_options['uniqueIndex'] == true && ! empty($this->_options['uniqueBy']))
     {
       $indexFields = array($this->_options['name']);
       $indexFields = array_merge($indexFields, $this->_options['uniqueBy']);
 
-      $this->index($this->getSortableIndexName(), array('fields' => $indexFields, 'type' => 'unique')); 
+      $this->index($this->getSortableIndexName(), array('fields' => $indexFields, 'type' => 'unique'));
 
     }
     elseif ($this->_options['unique'])
     {
       $indexFields = array($this->_options['name']);
-      $this->index($this->getSortableIndexName(), array('fields' => $indexFields, 'type' => 'unique')); 
+      $this->index($this->getSortableIndexName(), array('fields' => $indexFields, 'type' => 'unique'));
 
     }
 
     $this->addListener(new Doctrine_Template_Listener_Sortable($this->_options));
   }
-  
-  /** 
-  * Returns the name of the index to create for the position field. 
-  * 
-  * @return string 
-  */ 
-  protected function getSortableIndexName() 
-  { 
-    return sprintf('%s_%s_%s', $this->getTable()->getTableName(), $this->_options['name'], $this->_options['indexName']); 
-  } 
-  
-  
+
+  /**
+  * Returns the name of the index to create for the position field.
+  *
+  * @return string
+  */
+  protected function getSortableIndexName()
+  {
+    return sprintf('%s_%s_%s', $this->getTable()->getTableName(), $this->_options['name'], $this->_options['indexName']);
+  }
+
+
   /**
    * Demotes a sortable object to a lower position
    *
@@ -178,8 +178,6 @@ class Doctrine_Template_Sortable extends Doctrine_Template
     if ($position > $newPosition)
     {
       $q = $object->getTable()->createQuery()
-                              ->update(get_class($object))
-                              ->set($this->_options['name'], $this->_options['name'] . ' + 1')
                               ->where($this->_options['name'] . ' < ?', $position)
                               ->andWhere($this->_options['name'] . ' >= ?', $newPosition)
                               ->orderBy($this->_options['name'] . ' DESC');
@@ -189,14 +187,29 @@ class Doctrine_Template_Sortable extends Doctrine_Template
         $q->addWhere($field . ' = ?', $object[$field]);
       }
 
-      $q->execute();
+      // sqlite doesn't supports UPDATE with ORDER BY
+      // query syntax, so here is my walkaround #1
+
+      if ($connection->getDriverName() == 'Sqlite')
+      {
+        foreach ( $q->execute() as $item )
+        {
+          $pos = $item->get($this->_options['name'] );
+          $item->set($this->_options['name'], $pos+1)->save();
+        }
+      }
+      else
+      {
+        $q->update(get_class($object))
+          ->set($this->_options['name'], $this->_options['name'] . ' + 1')
+          ->execute();
+      }
+
     }
     elseif ($position < $newPosition)
     {
 
       $q = $object->getTable()->createQuery()
-                              ->update(get_class($object))
-                              ->set($this->_options['name'], $this->_options['name'] . ' - 1')
                               ->where($this->_options['name'] . ' > ?', $position)
                               ->andWhere($this->_options['name'] . ' <= ?', $newPosition)
                               ->orderBy($this->_options['name'] . ' ASC');
@@ -206,7 +219,24 @@ class Doctrine_Template_Sortable extends Doctrine_Template
         $q->addWhere($field . ' = ?', $object[$field]);
       }
 
-      $q->execute();
+      // sqlite doesn't supports UPDATE with ORDER BY
+      // query syntax, so here is my walkaround #2
+
+      if ($connection->getDriverName() == 'Sqlite')
+      {
+        foreach ( $q->execute() as $item )
+        {
+          $pos = $item->get($this->_options['name'] );
+          $item->set($this->_options['name'], $pos-1)->save();
+        }
+      }
+      else
+      {
+        $q->update(get_class($object))
+          ->set($this->_options['name'], $this->_options['name'] . ' - 1')
+          ->execute();
+      }
+
     }
 
     $object->set($this->_options['name'], $newPosition);
@@ -228,7 +258,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
   public function sortTableProxy($order)
   {
     /*
-      TODO 
+      TODO
         - Add proper error messages.
     */
     $table = $this->getInvoker()->getTable();

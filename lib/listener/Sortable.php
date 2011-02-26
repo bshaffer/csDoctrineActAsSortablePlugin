@@ -25,9 +25,9 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
   /**
    * __construct
    *
-   * @param array $options 
+   * @param array $options
    * @return void
-   */  
+   */
   public function __construct(array $options)
   {
     $this->_options = $options;
@@ -51,9 +51,9 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
   /**
    * When a sortable object is deleted, promote all objects positioned lower than itself
    *
-   * @param string $Doctrine_Event 
+   * @param string $Doctrine_Event
    * @return void
-   */  
+   */
   public function postDelete(Doctrine_Event $event)
   {
     $fieldName = $this->_options['name'];
@@ -61,8 +61,6 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     $position = $object->$fieldName;
 
     $q = $object->getTable()->createQuery()
-                            ->update(get_class($object))
-                            ->set($fieldName, $fieldName . ' - ?', '1')
                             ->where($fieldName . ' > ?', $position)
                             ->orderBy($fieldName);
 
@@ -71,6 +69,22 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
       $q->addWhere($field . ' = ?', $object[$field]);
     }
 
-    $q->execute();
-  }  
+    // sqlite doesn't supports UPDATE with ORDER BY
+    // query syntax, so here is my walkaround #3
+
+    if ($connection->getDriverName() == 'Sqlite')
+    {
+      foreach ( $q->execute() as $item )
+      {
+        $pos = $item->get($this->_options['name'] );
+        $item->set($this->_options['name'], $pos-1)->save();
+      }
+    }
+    else
+    {
+      $q->update(get_class($object))
+        ->set($fieldName, $fieldName . ' - ?', '1')
+        ->execute();
+    }
+  }
 }
