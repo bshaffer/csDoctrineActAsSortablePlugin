@@ -56,10 +56,11 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
    */
   public function postDelete(Doctrine_Event $event)
   {
-    $fieldName = $this->_options['name'];
-    $object = $event->getInvoker();
-    $position = $object->$fieldName;
-
+    $fieldName  = $this->_options['name'];
+    $object     = $event->getInvoker();
+    $position   = $object->$fieldName;
+    $connection = $object->getTable()->getConnection();
+    
     $q = $object->getTable()->createQuery()
                             ->where($fieldName . ' > ?', $position)
                             ->orderBy($fieldName);

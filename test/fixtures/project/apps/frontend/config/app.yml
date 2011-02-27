@@ -1,0 +1,11 @@
+all:
+  editable_content:
+
+    # class used to render the editable content areas
+    content_service_class: ioEditableContentService
+
+    content_service_options:
+      empty_text:          "[Test edit]"         # this content will be shown in place of empty content
+      edit_mode:           inline                # The default editor mode: fancybox|inline
+      admin_credential:    test_credential      # inline editing only made available to users with this credential
+      editable_class_name: test_editable_class_name

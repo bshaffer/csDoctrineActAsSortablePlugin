@@ -172,8 +172,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
     // Position is required to be unique. Blanks it out before it moves others up/down.
     $object->set($this->_options['name'], null);
-		$object->save();
-
+	$object->save();
 
     if ($position > $newPosition)
     {

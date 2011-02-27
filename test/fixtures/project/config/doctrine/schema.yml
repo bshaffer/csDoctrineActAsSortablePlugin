@@ -1,0 +1,13 @@
+SortableArticle:
+  columns:
+    name:           string(255)
+  actAs:  
+    Sortable:       ~
+      
+SortableArticleUniqueBy:
+  columns:
+    name:           string(255)
+    category:       string(255)
+  actAs:  
+    Sortable: 
+      uniqueBy:     [category]
