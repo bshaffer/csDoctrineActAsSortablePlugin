@@ -50,3 +50,7 @@ $t->info('Test Removing an item - items after it should be promoted');
     
     $a4->delete();
     $t->is($a3['position'], 1, '"Third item" has been promoted to "1" from "2"');
+    
+$t->info('cleanup');
+
+    Doctrine_Core::getTable('SortableArticleUniqueBy')->createQuery()->delete()->execute();

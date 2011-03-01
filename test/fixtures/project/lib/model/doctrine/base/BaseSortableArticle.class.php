@@ -24,6 +24,11 @@ abstract class BaseSortableArticle extends sfDoctrineRecord
              'type' => 'string',
              'length' => 255,
              ));
+
+        $this->option('symfony', array(
+             'form' => false,
+             'filter' => false,
+             ));
     }
 
     public function setUp()

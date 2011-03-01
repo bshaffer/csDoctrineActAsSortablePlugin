@@ -1,10 +1,18 @@
 SortableArticle:
+  options:
+    symfony:
+      form:         false
+      filter:       false
   columns:
     name:           string(255)
   actAs:  
     Sortable:       ~
       
 SortableArticleUniqueBy:
+  options:
+    symfony:
+      form:         false
+      filter:       false
   columns:
     name:           string(255)
     category:       string(255)

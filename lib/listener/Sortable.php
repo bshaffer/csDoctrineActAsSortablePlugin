@@ -73,7 +73,13 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     // sqlite doesn't supports UPDATE with ORDER BY
     // query syntax, so here is my walkaround #3
 
-    if ($connection->getDriverName() == 'Sqlite')
+    if ($this->canUpdateWithOrderBy($connection))
+    {
+      $q->update(get_class($object))
+        ->set($fieldName, $fieldName . ' - ?', '1')
+        ->execute();
+    }
+    else
     {
       foreach ( $q->execute() as $item )
       {
@@ -81,11 +87,11 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
         $item->set($this->_options['name'], $pos-1)->save();
       }
     }
-    else
-    {
-      $q->update(get_class($object))
-        ->set($fieldName, $fieldName . ' - ?', '1')
-        ->execute();
-    }
+  }
+  
+  // sqlite/pgsql doesn't supports UPDATE with ORDER BY
+  protected function canUpdateWithOrderBy(Doctrine_Connection $connection)
+  {
+      return $connection->getDriverName() != 'Pgsql' && $connection->getDriverName() != 'Sqlite';
   }
 }

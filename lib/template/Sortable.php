@@ -18,17 +18,19 @@ class Doctrine_Template_Sortable extends Doctrine_Template
    *
    * @var string
    */
-  protected $_options = array('name'        =>  'position',
-                              'alias'       =>  null,
-                              'type'        =>  'integer',
-                              'length'      =>  8,
-                              'unique'      =>  true,
-                              'options'     =>  array(),
-                              'fields'      =>  array(),
-                              'uniqueBy'    =>  array(),
-                              'uniqueIndex' =>  true,
-                              'indexName'   =>  'sortable'
-  );
+  protected 
+      $_options = array(
+          'name'        =>  'position',
+          'alias'       =>  null,
+          'type'        =>  'integer',
+          'length'      =>  8,
+          'unique'      =>  true,
+          'options'     =>  array(),
+          'fields'      =>  array(),
+          'uniqueBy'    =>  array(),
+          'uniqueIndex' =>  true,
+          'indexName'   =>  'sortable')
+  ;
 
   /**
    * __construct
@@ -189,19 +191,19 @@ class Doctrine_Template_Sortable extends Doctrine_Template
       // sqlite doesn't supports UPDATE with ORDER BY
       // query syntax, so here is my walkaround #1
 
-      if ($connection->getDriverName() == 'Sqlite')
+      if ($this->canUpdateWithOrderBy($connection))
+      {
+        $q->update(get_class($object))
+          ->set($this->_options['name'], $this->_options['name'] . ' + 1')
+          ->execute();
+      }
+      else
       {
         foreach ( $q->execute() as $item )
         {
           $pos = $item->get($this->_options['name'] );
           $item->set($this->_options['name'], $pos+1)->save();
         }
-      }
-      else
-      {
-        $q->update(get_class($object))
-          ->set($this->_options['name'], $this->_options['name'] . ' + 1')
-          ->execute();
       }
 
     }
@@ -218,22 +220,22 @@ class Doctrine_Template_Sortable extends Doctrine_Template
         $q->addWhere($field . ' = ?', $object[$field]);
       }
 
-      // sqlite doesn't supports UPDATE with ORDER BY
+      // sqlite/pgsql doesn't supports UPDATE with ORDER BY
       // query syntax, so here is my walkaround #2
 
-      if ($connection->getDriverName() == 'Sqlite')
+      if ($this->canUpdateWithOrderBy($connection))
+      {
+        $q->update(get_class($object))
+          ->set($this->_options['name'], $this->_options['name'] . ' - 1')
+          ->execute();
+      }
+      else
       {
         foreach ( $q->execute() as $item )
         {
           $pos = $item->get($this->_options['name'] );
           $item->set($this->_options['name'], $pos-1)->save();
         }
-      }
-      else
-      {
-        $q->update(get_class($object))
-          ->set($this->_options['name'], $this->_options['name'] . ' - 1')
-          ->execute();
       }
 
     }
@@ -401,5 +403,11 @@ class Doctrine_Template_Sortable extends Doctrine_Template
    $finalPosition = $last ? $last->get($this->_options['name']) : 0;
 
    return (int)$finalPosition;
+  }
+  
+  // sqlite/pgsql doesn't supports UPDATE with ORDER BY
+  protected function canUpdateWithOrderBy(Doctrine_Connection $connection)
+  {
+      return $connection->getDriverName() != 'Pgsql' && $connection->getDriverName() != 'Sqlite';
   }
 }

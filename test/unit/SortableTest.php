@@ -26,11 +26,11 @@ $t->info('Assert articles have thecorrect position');
 
 $t->info('Test Demote and Promote');
 
-    $a1->demote();
+    $a1->demote(); doctrine_refresh($a2);
     $t->is($a1['position'], 2, 'First item now has position of 2');
     $t->is($a2['position'], 1, 'Second item now has position of 1');
 
-    $a3->promote();
+    $a3->promote(); doctrine_refresh($a1);
     $t->is($a1['position'], 3, 'First item now has position of 3');
     $t->is($a3['position'], 2, 'Third item now has position of 2');
 
@@ -59,7 +59,7 @@ $t->info('Test Table Method "sort()"');
 $t->info('Test Removing an item - items after it should be promoted');
 
     $t->is($a2->getFinalPosition(), 3, '"Final Position" is "3" before the item is deleted');
-    $a3->delete();
+    $a3->delete(); doctrine_refresh($a1);
     $t->is($a1['position'], 2, '"First item" has been promoted to "2" from "3"');
     $t->is($a2['position'], 1, '"Second item" stays at position "1"');
     $t->is($a2->getFinalPosition(), 2, '"Final Position" is now "2"');
@@ -71,5 +71,9 @@ $t->info('Test "moveToPosition" method');
     $a4->save();
 
     $t->is($a4['position'], 3, 'The new article is placed at the end');
-    $a4->moveToPosition(1);
+    $a4->moveToPosition(1); doctrine_refresh($a1);
     $t->is($a1['position'], 3, 'The 2nd-positioned item has been bumped up');
+    
+$t->info('cleanup');
+
+    Doctrine_Core::getTable('SortableArticle')->createQuery()->delete()->execute();
