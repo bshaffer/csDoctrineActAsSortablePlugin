@@ -73,6 +73,31 @@ $t->info('Test "moveToPosition" method');
     $t->is($a4['position'], 3, 'The new article is placed at the end');
     $a4->moveToPosition(1); doctrine_refresh($a1);
     $t->is($a1['position'], 3, 'The 2nd-positioned item has been bumped up');
+
+$t->info('Test deleting a collection of sortable items');
+    
+    $d1 = new SortableArticle();
+    $d1->name = 'Article To Delete 1';
+    $d1->save();
+
+    $d2 = new SortableArticle();
+    $d2->name = 'Article To Delete 2';
+    $d2->save();
+    
+    $d3 = new SortableArticle();
+    $d3->name = 'Article To Delete 3';
+    $d3->save();
+    
+    $collection = Doctrine_Collection::create('SortableArticle');
+    $collection[] = $d1;
+    $collection[] = $d2;
+    $collection[] = $d3;
+    
+    $collection->delete();
+    
+    $t->ok(!$d1->exists(), '"Article To Delete 1" has been removed');
+    $t->ok(!$d2->exists(), '"Article To Delete 2" has been removed');
+    $t->ok(!$d3->exists(), '"Article To Delete 3" has been removed');
     
 $t->info('cleanup');
 
