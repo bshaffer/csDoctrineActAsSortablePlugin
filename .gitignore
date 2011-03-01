@@ -1,2 +1,4 @@
 test/fixtures/project/cache/*
 test/fixtures/project/data/test.sqlite
+test/fixtures/project/lib/filter
+test/fixtures/project/lib/form

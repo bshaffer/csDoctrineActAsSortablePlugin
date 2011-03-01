@@ -47,7 +47,6 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     $object->$fieldName = $object->getFinalPosition()+1;
   }
 
-
   /**
    * When a sortable object is deleted, promote all objects positioned lower than itself
    *
@@ -56,11 +55,12 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
    */
   public function postDelete(Doctrine_Event $event)
   {
-    $fieldName  = $this->_options['name'];
-    $object     = $event->getInvoker();
-    $position   = $object->$fieldName;
-    $connection = $object->getTable()->getConnection();
-    
+    $fieldName = $this->_options['name'];
+    $object    = $event->getInvoker();
+    $position  = $object->$fieldName;
+    $conn      = $object->getTable()->getConnection();
+
+    // Create query to update other positions
     $q = $object->getTable()->createQuery()
                             ->where($fieldName . ' > ?', $position)
                             ->orderBy($fieldName);
@@ -70,10 +70,12 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
       $q->addWhere($field . ' = ?', $object[$field]);
     }
 
-    // sqlite doesn't supports UPDATE with ORDER BY
-    // query syntax, so here is my walkaround #3
-
-    if ($this->canUpdateWithOrderBy($connection))
+    if (
+        // If transaction level is greater than 1, 
+        // query will throw exceptions when using this function
+        $conn->getTransactionLevel() < 2 
+        // some drivers do not support UPDATE with ORDER BY query syntax
+        && $this->canUpdateWithOrderBy($conn))
     {
       $q->update(get_class($object))
         ->set($fieldName, $fieldName . ' - ?', '1')
@@ -89,9 +91,9 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     }
   }
   
-  // sqlite/pgsql doesn't supports UPDATE with ORDER BY
-  protected function canUpdateWithOrderBy(Doctrine_Connection $connection)
+  // some drivers do not support UPDATE with ORDER BY
+  protected function canUpdateWithOrderBy(Doctrine_Connection $conn)
   {
-      return $connection->getDriverName() != 'Pgsql' && $connection->getDriverName() != 'Sqlite';
+      return $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
   }
 }

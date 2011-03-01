@@ -13,9 +13,25 @@ SortableArticleUniqueBy:
     symfony:
       form:         false
       filter:       false
-  columns:
-    name:           string(255)
-    category:       string(255)
   actAs:  
     Sortable: 
-      uniqueBy:     [category]
+      uniqueBy:     [category_id]
+  columns:
+    name:           string(255)
+    category_id:
+      type: integer(4)
+      notnull: true
+      unsigned: true
+  relations:
+    Category:
+      local:        category_id
+      class:        SortableArticleCategory
+      
+SortableArticleCategory:
+  columns:
+    id:
+      type: integer(4)
+      primary: true
+      autoincrement: true
+      unsigned: true
+    name: string(100)

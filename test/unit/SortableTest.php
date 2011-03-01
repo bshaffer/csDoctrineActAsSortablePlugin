@@ -6,6 +6,9 @@ $t = new lime_test();
 
 $t->info('Create Sortable Sample Set');
 
+    Doctrine_Core::getTable('SortableArticle')
+        ->createQuery()->delete()->execute();
+    
     $a1 = new SortableArticle();
     $a1->name = 'First Article';
     $a1->save();
@@ -88,17 +91,19 @@ $t->info('Test deleting a collection of sortable items');
     $d3->name = 'Article To Delete 3';
     $d3->save();
     
+    $d4 = new SortableArticle();
+    $d4->name = 'Article To Delete 4';
+    $d4->save();
+    
     $collection = Doctrine_Collection::create('SortableArticle');
     $collection[] = $d1;
     $collection[] = $d2;
     $collection[] = $d3;
+    $collection[] = $d4;
     
     $collection->delete();
     
     $t->ok(!$d1->exists(), '"Article To Delete 1" has been removed');
     $t->ok(!$d2->exists(), '"Article To Delete 2" has been removed');
     $t->ok(!$d3->exists(), '"Article To Delete 3" has been removed');
-    
-$t->info('cleanup');
-
-    Doctrine_Core::getTable('SortableArticle')->createQuery()->delete()->execute();
+    $t->ok(!$d4->exists(), '"Article To Delete 4" has been removed');

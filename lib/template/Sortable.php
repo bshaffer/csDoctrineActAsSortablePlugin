@@ -167,10 +167,10 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
     $object = $this->getInvoker();
     $position = $object->get($this->_options['name']);
-    $connection = $object->getTable()->getConnection();
+    $conn = $object->getTable()->getConnection();
 
     //begin Transaction
-    $connection->beginTransaction();
+    $conn->beginTransaction();
 
     // Position is required to be unique. Blanks it out before it moves others up/down.
     $object->set($this->_options['name'], null);
@@ -188,10 +188,9 @@ class Doctrine_Template_Sortable extends Doctrine_Template
         $q->addWhere($field . ' = ?', $object[$field]);
       }
 
-      // sqlite doesn't supports UPDATE with ORDER BY
-      // query syntax, so here is my walkaround #1
+      // some drivers do not support UPDATE with ORDER BY query syntax
 
-      if ($this->canUpdateWithOrderBy($connection))
+      if ($this->canUpdateWithOrderBy($conn))
       {
         $q->update(get_class($object))
           ->set($this->_options['name'], $this->_options['name'] . ' + 1')
@@ -220,10 +219,9 @@ class Doctrine_Template_Sortable extends Doctrine_Template
         $q->addWhere($field . ' = ?', $object[$field]);
       }
 
-      // sqlite/pgsql doesn't supports UPDATE with ORDER BY
-      // query syntax, so here is my walkaround #2
+      // some drivers do not support UPDATE with ORDER BY query syntax
 
-      if ($this->canUpdateWithOrderBy($connection))
+      if ($this->canUpdateWithOrderBy($conn))
       {
         $q->update(get_class($object))
           ->set($this->_options['name'], $this->_options['name'] . ' - 1')
@@ -244,7 +242,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 		$object->save();
 
     // Commit Transaction
-    $connection->commit();
+    $conn->commit();
   }
 
 
@@ -264,9 +262,9 @@ class Doctrine_Template_Sortable extends Doctrine_Template
     */
     $table = $this->getInvoker()->getTable();
     $class  = get_class($this->getInvoker());
-    $connection = $table->getConnection();
+    $conn = $table->getConnection();
 
-    $connection->beginTransaction();
+    $conn->beginTransaction();
 
     foreach ($order as $position => $id)
     {
@@ -279,7 +277,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
     }
 
     // Commit Transaction
-    $connection->commit();
+    $conn->commit();
   }
 
 
@@ -406,8 +404,8 @@ class Doctrine_Template_Sortable extends Doctrine_Template
   }
   
   // sqlite/pgsql doesn't supports UPDATE with ORDER BY
-  protected function canUpdateWithOrderBy(Doctrine_Connection $connection)
+  protected function canUpdateWithOrderBy(Doctrine_Connection $conn)
   {
-      return $connection->getDriverName() != 'Pgsql' && $connection->getDriverName() != 'Sqlite';
+      return $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
   }
 }
