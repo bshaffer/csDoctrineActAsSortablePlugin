@@ -70,12 +70,7 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
       $q->addWhere($field . ' = ?', $object[$field]);
     }
 
-    if (
-        // If transaction level is greater than 1, 
-        // query will throw exceptions when using this function
-        $conn->getTransactionLevel() < 2 
-        // some drivers do not support UPDATE with ORDER BY query syntax
-        && $this->canUpdateWithOrderBy($conn))
+    if ($this->canUpdateWithOrderBy($conn))
     {
       $q->update(get_class($object))
         ->set($fieldName, $fieldName . ' - ?', '1')
@@ -94,6 +89,10 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
   // some drivers do not support UPDATE with ORDER BY
   protected function canUpdateWithOrderBy(Doctrine_Connection $conn)
   {
-      return $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
+      // If transaction level is greater than 1, 
+      // query will throw exceptions when using this function
+      return $conn->getTransactionLevel() < 2 &&
+        // some drivers do not support UPDATE with ORDER BY query syntax
+        $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
   }
 }

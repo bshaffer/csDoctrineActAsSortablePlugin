@@ -189,7 +189,6 @@ class Doctrine_Template_Sortable extends Doctrine_Template
       }
 
       // some drivers do not support UPDATE with ORDER BY query syntax
-
       if ($this->canUpdateWithOrderBy($conn))
       {
         $q->update(get_class($object))
@@ -220,7 +219,6 @@ class Doctrine_Template_Sortable extends Doctrine_Template
       }
 
       // some drivers do not support UPDATE with ORDER BY query syntax
-
       if ($this->canUpdateWithOrderBy($conn))
       {
         $q->update(get_class($object))
@@ -406,6 +404,6 @@ class Doctrine_Template_Sortable extends Doctrine_Template
   // sqlite/pgsql doesn't supports UPDATE with ORDER BY
   protected function canUpdateWithOrderBy(Doctrine_Connection $conn)
   {
-      return $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
+    return $this->getListener()->canUpdateWithOrderBy($conn);
   }
 }
