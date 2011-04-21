@@ -87,7 +87,7 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
   }
   
   // some drivers do not support UPDATE with ORDER BY
-  protected function canUpdateWithOrderBy(Doctrine_Connection $conn)
+  public function canUpdateWithOrderBy(Doctrine_Connection $conn)
   {
       // If transaction level is greater than 1, 
       // query will throw exceptions when using this function

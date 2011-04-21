@@ -404,6 +404,6 @@ class Doctrine_Template_Sortable extends Doctrine_Template
   // sqlite/pgsql doesn't supports UPDATE with ORDER BY
   protected function canUpdateWithOrderBy(Doctrine_Connection $conn)
   {
-    return $this->getListener()->canUpdateWithOrderBy($conn);
+    return $this->getListener()->get(0)->canUpdateWithOrderBy($conn);
   }
 }
