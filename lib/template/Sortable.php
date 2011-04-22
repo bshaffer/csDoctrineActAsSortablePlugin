@@ -18,7 +18,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
    *
    * @var string
    */
-  protected 
+  protected
       $_options = array(
           'name'        =>  'position',
           'alias'       =>  null,
@@ -400,10 +400,14 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
    return (int)$finalPosition;
   }
-  
+
   // sqlite/pgsql doesn't supports UPDATE with ORDER BY
   protected function canUpdateWithOrderBy(Doctrine_Connection $conn)
   {
-    return $this->getListener()->canUpdateWithOrderBy($conn);
+    // If transaction level is greater than 1,
+    // query will throw exceptions when using this function
+    return $conn->getTransactionLevel() < 2 &&
+      // some drivers do not support UPDATE with ORDER BY query syntax
+      $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
   }
 }
