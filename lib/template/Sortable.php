@@ -385,13 +385,14 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
    foreach($this->_options['uniqueBy'] as $field)
    {
-     if(is_object($object[$field]))
+     $value = (is_object($object[$field])) ? $object[$field]['id'] : $object[$field];
+     if (!empty($value))
      {
-       $q->addWhere($field . ' = ?', $object[$field]['id']);
+      $q->addWhere($field . ' = ?', $value);
      }
      else
      {
-       $q->addWhere($field . ' = ?', $object[$field]);
+      $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $value);
      }
    }
 
