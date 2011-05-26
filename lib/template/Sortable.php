@@ -411,4 +411,66 @@ class Doctrine_Template_Sortable extends Doctrine_Template
       // some drivers do not support UPDATE with ORDER BY query syntax
       $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
   }
+  
+  /**
+   * Get the first object of a model
+   *
+   * @return class $object
+   */
+  public function getFirst() {
+  	$object = $this->getInvoker();
+
+    $q = $object->getTable()->createQuery()
+                            ->select($this->_options['name'])
+                            ->orderBy($this->_options['name'] . ' asc');
+    $first = $q->limit(1)->fetchOne();
+    return $first;
+  }
+  
+  /**
+   * Get the final object of a model
+   *
+   * @return class $object
+   */
+  public function getLast() {
+  	$object = $this->getInvoker();
+
+    $q = $object->getTable()->createQuery()
+                            ->select($this->_options['name'])
+                            ->orderBy($this->_options['name'] . ' desc');
+    $last = $q->limit(1)->fetchOne();
+    return $last;
+  }
+  
+  /**
+   * Get the previous object of a model
+   *
+   * @return class $object
+   */
+  public function getPrev() {
+  	$object = $this->getInvoker();
+
+    $q = $object->getTable()->createQuery()
+                            ->select()
+                            ->where($this->_options['name'] . ' = ?', call_user_func(array($object, 'get'.ucfirst($this->_options['name'])))-1);
+    $prev = $q->fetchOne();
+    $finalPrev = $prev ? $prev : $this->getLast();
+    return $finalPrev;
+  }
+  
+  /**
+   * Get the next object of a model
+   *
+   * @return class $object
+   */
+  public function getNext() {
+  	$object = $this->getInvoker();
+
+    $q = $object->getTable()->createQuery()
+                            ->select()
+                            ->where($this->_options['name'] . ' = ?', call_user_func(array($object, 'get'.ucfirst($this->_options['name'])))+1);
+    $next = $q->fetchOne();
+    $finalNext = $next ? $next : $this->getFirst();
+    return $finalNext;
+  }
 }
