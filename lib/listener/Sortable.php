@@ -21,6 +21,12 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
    */
   protected $_options = array();
 
+  /**
+   * Array to store old values
+   *
+   * @var array
+   */
+  protected $_oldValues = array();
 
   /**
    * __construct
@@ -48,6 +54,65 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
   }
 
   /**
+   * Set the position value automatically when a sortable object is updated
+   *
+   * @param Doctrine_Event $event
+   * @return void
+   */
+  public function preUpdate(Doctrine_Event $event)
+  {
+      $fieldName = $this->_options['name'];
+      $object = $event->getInvoker();
+      $_modified = $object->getModified(true);
+      $this->_oldValues[$fieldName] = $object->$fieldName;
+      
+      foreach ($this->_options['uniqueBy'] as $key)
+      {
+          if (array_key_exists($key, $object->getModified(true)))
+          {
+              $this->_oldValues[$key] = $_modified[$key];
+          }
+      }
+
+      if (count($this->_oldValues) > 1)
+      {
+          $object->$fieldName = $object->getFinalPosition() + 1;
+      }
+  }
+
+  /**
+   * Set the position value automatically when a sortable object is updated
+   *
+   * @param Doctrine_Event $event
+   * @return void
+   */
+  public function postUpdate(Doctrine_Event $event)
+  {
+      $fieldName = $this->_options['name'];
+      $object = $event->getInvoker();
+      $position = $this->_oldValues[$fieldName];
+
+      if (count($this->_oldValues) > 1)
+      {
+          $q = $this->getBaseQueryOrder($object, $fieldName, $position);
+          $q->orderBy($fieldName);
+
+          foreach ($this->_options['uniqueBy'] as $field) {
+              if (array_key_exists($field, $this->_oldValues))
+              {
+                  $q->addWhere($field . ' = ?', $this->_oldValues[$field]);
+              }
+              else
+              {
+                  $q->addWhere($field . ' = ?', $object[$field]);
+              }
+          }
+
+          $q->execute();
+      }
+  }
+ 
+  /**
    * When a sortable object is deleted, promote all objects positioned lower than itself
    *
    * @param string $Doctrine_Event
@@ -61,9 +126,7 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     $conn      = $object->getTable()->getConnection();
 
     // Create query to update other positions
-    $q = $object->getTable()->createQuery()
-                            ->where($fieldName . ' > ?', $position)
-                            ->orderBy($fieldName);
+    $q = $this->getBaseQueryOrder($object, $fieldName, $position);
 
     foreach ($this->_options['uniqueBy'] as $field)
     {
@@ -72,9 +135,8 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
 
     if ($this->canUpdateWithOrderBy($conn))
     {
-      $q->update(get_class($object))
-        ->set($fieldName, $fieldName . ' - ?', '1')
-        ->execute();
+        $q->orderBy($fieldName)
+          ->execute();
     }
     else
     {
@@ -94,5 +156,21 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     return $conn->getTransactionLevel() < 2 &&
       // some drivers do not support UPDATE with ORDER BY query syntax
       $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
+  }
+
+  /**
+   * Set the position value automatically when a sortable object is updated
+   *
+   * @param  Doctrine_Record $object
+   * @param  string $fieldname
+   * @param  integer $position
+   * @return Doctrine_Query
+   */
+  private function getBaseQueryOrder($object, $fieldName, $position)
+  {
+      return $object->getTable()->createQuery()
+                              ->update(get_class($object))
+                              ->set($fieldName, $fieldName . ' - ?', '1')
+                              ->where($fieldName . ' > ?', $position);
   }
 }
