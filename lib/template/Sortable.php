@@ -107,7 +107,12 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
     if ($position < $object->getFinalPosition())
     {
-      $object->moveToPosition($position + 1);
+      $position = $this->getNextPosition();
+
+      if (0 != $position)
+      {
+        $object->moveToPosition($position);
+      }
     }
   }
 
@@ -124,7 +129,12 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
     if ($position > 1)
     {
-      $object->moveToPosition($position - 1);
+      $position = $this->getPrevPosition();
+
+      if (0 != $position)
+      {
+        $object->moveToPosition($position);
+      }
     }
   }
 
@@ -369,6 +379,67 @@ class Doctrine_Template_Sortable extends Doctrine_Template
     return $order;
   }
 
+
+  /**
+   * Returns the position of the previous record.
+   *
+   * @return int Previous position
+   */
+  public function getPrevPosition()
+  {
+    $object = $this->getInvoker();
+
+    $q = $object->getTable()->createQuery();
+    $q->select($this->_options['name']);
+    $q->orderBy($this->_options['name'] . ' desc');
+
+    $q->addWhere($this->_options['name'] . ' < ?', $object->get($this->_options['name']));
+
+    foreach($this->_options['uniqueBy'] as $field)
+    {
+      if(is_object($object[$field]))
+      {
+        $q->addWhere($field . ' = ?', $object[$field]['id']);
+      }
+      else
+      {
+        $q->addWhere($field . ' = ?', $object[$field]);
+      }
+    }
+
+    $prev = $q->limit(1)->fetchOne();
+    $position = $prev ? $prev->get($this->_options['name']) : 0;
+
+    return (int) $position;
+  }
+
+  public function getNextPosition()
+  {
+    $object = $this->getInvoker();
+
+    $q = $object->getTable()->createQuery();
+    $q->select($this->_options['name']);
+    $q->orderBy($this->_options['name'] . ' asc');
+
+    $q->addWhere($this->_options['name'] . ' > ?', $object->get($this->_options['name']));
+
+    foreach($this->_options['uniqueBy'] as $field)
+    {
+      if(is_object($object[$field]))
+      {
+        $q->addWhere($field . ' = ?', $object[$field]['id']);
+      }
+      else
+      {
+        $q->addWhere($field . ' = ?', $object[$field]);
+      }
+    }
+
+    $next = $q->limit(1)->fetchOne();
+    $position = $next ? $next->get($this->_options['name']) : 0;
+
+    return (int) $position;
+  }
 
   /**
    * Get the final position of a model
