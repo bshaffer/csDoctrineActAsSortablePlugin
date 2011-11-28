@@ -31,12 +31,18 @@ $t->info('Create Sortable Sample Set');
     $a4->Category = $categories[1];
     $a4->save();
 
+    $a5 = new SortableArticleUniqueBy();
+    $a5->name = 'Fifth Article';
+    $a5->Category = $categories[1];
+    $a5->save();
+
 $t->info('Assert articles have the correct position');
 
     $t->is($a1['position'], 1, 'First item saved has position of 1 (first in category 1)');
     $t->is($a2['position'], 2, 'Second item saved has position of 2 (second in category 1)');
     $t->is($a3['position'], 1, 'Third item saved has position of 1 (first in category 2)');
-    $t->is($a4['position'], 2, 'Third item saved has position of 2 (second in category 2)');
+    $t->is($a4['position'], 2, 'Fourth item saved has position of 2 (second in category 2)');
+    $t->is($a5['position'], 3, 'Fifth item saved has position of 3 (third in category 2)');
 
 $t->info('Test Demote and Promote');
 
@@ -47,6 +53,7 @@ $t->info('Test Demote and Promote');
     $a3->demote(); doctrine_refresh($a4);
     $t->is($a3['position'], 2, 'Third item now has position of 2');
     $t->is($a4['position'], 1, 'Fourth item now has position of 1');
+    $t->is($a5['position'], 3, 'Fifth item still has a position of 3');
     
 $t->info('Test Removing an item - items after it should be promoted');
 
@@ -55,6 +62,7 @@ $t->info('Test Removing an item - items after it should be promoted');
     
     $a4->delete(); doctrine_refresh($a3);
     $t->is($a3['position'], 1, '"Third item" has been promoted to "1" from "2"');
+    $t->is($a5['position'], 2, '"Fifth item" has been promoted to "2" from "3"');
     
 $t->info('Test deleting a collection of sortable items');
     
