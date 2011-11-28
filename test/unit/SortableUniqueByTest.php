@@ -64,6 +64,18 @@ $t->info('Test Removing an item - items after it should be promoted');
     $t->is($a3['position'], 1, '"Third item" has been promoted to "1" from "2"');
     $t->is($a5['position'], 2, '"Fifth item" has been promoted to "2" from "3"');
     
+$t->info('Test Moving an item to a different category with an item already at the same rank');
+    
+    try {
+      $a1->Category = $categories[1];
+      $a1->save();
+    } catch (Doctrine_Connection_Sqlite_Exception $e) {
+      $t->info('WARNING: Doctrine_Connection_Sqlite_Exception caught.');
+    }
+    doctrine_refresh($a1);
+    $t->is($a1['category_id'], $categories[1]['id'], sprintf('"First item" has been moved to %s', $a3['Category']['name']));
+    $t->is($a1['position'], 3, '"First item" has been moved to "3" from "1"');
+
 $t->info('Test deleting a collection of sortable items');
     
     $d1 = new SortableArticleUniqueBy();

@@ -48,6 +48,30 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
   }
 
   /**
+   * When a sortable object is updated, check to see if any of the uniqueBy
+   * fields are modified before saving to prevent two items having the same
+   * position.
+   *
+   * @param string $Doctrine_Event
+   * @return void
+   */
+  public function preUpdate(Doctrine_Event $event) {
+    $fieldName = $this->_options['name'];
+    $object = $event->getInvoker();
+    $modified = $object->getModified();
+
+    //-- Check to see if any of the uniqueBy fields have been modified
+    foreach ($this->_options['uniqueBy'] as $field)
+    {
+      if ( array_key_exists($field, $modified) ) {
+        //-- Move it to the end
+        $object->$fieldName = $object->getFinalPosition()+1;
+        break;
+      }
+    }
+  }
+
+  /**
    * When a sortable object is deleted, promote all objects positioned lower than itself
    *
    * @param string $Doctrine_Event
