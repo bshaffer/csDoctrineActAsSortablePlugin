@@ -70,6 +70,18 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
       }
     }
   }
+  
+  /**
+   * When a sortable object is deleted, refresh it BEFORE it is deleted, to 
+   * have the right position in postDelete
+   *
+   * @param Doctrine_Event $event
+   * @return void
+   */
+  public function preDelete(Doctrine_Event $event)
+  {
+    $object = $event->getInvoker()->refresh();
+  }
 
   /**
    * When a sortable object is deleted, promote all objects positioned lower than itself
