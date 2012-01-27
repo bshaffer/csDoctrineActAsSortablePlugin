@@ -44,8 +44,8 @@ $t->info('Fetch articles and delete them like in batchDelete');
     try {
       foreach($articles as $article) {
         $article->delete();
+        $t->pass(sprintf('Successfully deleted article %s', $article['id']));
       }
-      $t->info('Successfully batch deleted articles');
     } catch (Exception $e) {
       $t->fail('Failure while batch-deleting ' . $e->getMessage());
     }
