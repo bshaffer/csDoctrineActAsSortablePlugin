@@ -1,0 +1,18 @@
+language: php
+
+php:
+  - 5.3
+
+before_script:
+  - ./bin/travis-init.sh
+  - "export SYMFONY=`pwd`/lib/vendor/symfony/lib/"
+
+script:
+  - php test/unit/SortableTest.php
+  - php test/unit/SortableBatchTest.php
+  - php test/unit/SortableUniqueByTest.php
+
+env:
+ - DB=postgre
+ - DB=mysql
+ - DB=sqlite
