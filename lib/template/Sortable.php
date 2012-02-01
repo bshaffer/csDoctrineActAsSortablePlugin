@@ -105,7 +105,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
     $object = $this->getInvoker();
     $position = $object->get($this->_options['name']);
 
-    if ($position < $object->getFinalPosition())
+    if ($position < $this->getFinalPosition())
     {
       $position = $this->getNextPosition();
 
