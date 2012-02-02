@@ -54,7 +54,7 @@ class sfPluginTestBootstrap
   // Find all tests and run them
   public function run()
   {
-    $h = new lime_harness(new lime_output_color());
+    $h = new lime_harness(array('verbose' => true, 'output' => new lime_output_color()));
     $h->register(sfFinder::type('file')->name('*Test.php')->in(dirname(__FILE__).'/..'));
 
     exit($h->run() ? 0 : 1);
