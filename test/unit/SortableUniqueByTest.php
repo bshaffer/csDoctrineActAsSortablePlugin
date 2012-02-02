@@ -59,8 +59,8 @@ $t->info('Test Removing an item - items after it should be promoted');
 
     $a2->delete(); doctrine_refresh($a1);
     $t->is($a1['position'], 1, '"First item" has been promoted to "1" from "2"');
-    
-    $a4->delete(); doctrine_refresh($a3);
+
+    $a4->delete(); doctrine_refresh($a3, $a5);
     $t->is($a3['position'], 1, '"Third item" has been promoted to "1" from "2"');
     $t->is($a5['position'], 2, '"Fifth item" has been promoted to "2" from "3"');
     
