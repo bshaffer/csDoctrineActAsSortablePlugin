@@ -37,19 +37,24 @@ class sfPluginTestBootstrap
     // Special Handling for postgre, since droping even when closing the connection, fails with
     // SQLSTATE[55006]: Object in use: 7 ERROR:  database "cs_doctrine_act_as_sortable_test" is being accessed by other users DETAIL:  There are 1 other session(s) using the database.
     if ($db->getDoctrineConnection() instanceof Doctrine_Connection_Pgsql) {
+        
         $export = new Doctrine_Export_Pgsql($db->getDoctrineConnection());
         $import = new Doctrine_Import_Pgsql($db->getDoctrineConnection());
-        $tablenames = array(
-            SortableArticleTable::getInstance()->getTableName(),
-            SortableArticleUniqueByTable::getInstance()->getTableName(),
-            SortableArticleCategoryTable::getInstance()->getTableName()
-        );
+        if($import->databaseExists('cs_doctrine_act_as_sortable_test')) {
+            $tablenames = array(
+                SortableArticleTable::getInstance()->getTableName(),
+                SortableArticleUniqueByTable::getInstance()->getTableName(),
+                SortableArticleCategoryTable::getInstance()->getTableName()
+            );
 
-        foreach($tablenames as $tablename)
-        {
-            if ($import->tableExists($tablename)) {
-                $export->dropTable($tablename);
+            foreach($tablenames as $tablename)
+            {
+                if ($import->tableExists($tablename)) {
+                    $export->dropTable($tablename);
+                }
             }
+        } else {
+                    $db->getDoctrineConnection()->createDatabase();
         }
     } else {
         try {
