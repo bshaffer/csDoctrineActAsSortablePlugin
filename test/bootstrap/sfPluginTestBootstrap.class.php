@@ -148,6 +148,11 @@ class sfPluginTestBootstrap
         $dbms = strtolower($_SERVER['DB']);
     }
 
+    // Check if configuration for dbms exists
+    if (!file_exists(dirname(__FILE__).'/../fixtures/project/config/database-' . $dbms . '.yml')) {
+        throw new Exception('Didnt find database-'.$dbms. 'yml for DBMS: "' . $dbms . '"');
+    }
+
     copy(dirname(__FILE__).'/../fixtures/project/config/database-' . $dbms . '.yml',
          dirname(__FILE__).'/../fixtures/project/config/databases.yml');
 
