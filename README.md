@@ -132,13 +132,15 @@ In your module, edit `actions/actions.class.php`, Add the following actions:
 Running Unit Tests
 ------------------
 
-First you have to set where the symfony library you'd like to run it against is located:
+This plugin comes with a fully functional test suite.  If you'd like to run this against the symfony version
+used in your project, export the `$symfony` environment variable as follows:
 
     export SYMFONY=/usr/share/php/symfony
 
-(PEAR installed symfony on an Ubuntu/Debian-system)
+The above is where PEAR installs symfony on an Ubuntu/Debian-system.  
+**Be sure to point this at your symfony `lib` directory!**
 
-By default, this will run against a sqlite database.  If you'd like to run against postgres or mysql, 
+By default, this will run against a `sqlite` database.  If you'd like to run against `postgres` or `mysql`, 
 export the environmental `$DB` variable as follows:
 
     # Running against mysql:
@@ -147,9 +149,9 @@ export the environmental `$DB` variable as follows:
     #Running against postgre:
     export DB=postgre; php ./test/bin/prove.php
 
-Database connection data:
+*Database connection data*
 
-mySQL uses root with no password per default
-postgreSQL uses postgres with no password per default
+ - mySQL uses root with no password per default
+ - postgreSQL uses postgres with no password per default
 
-Database-Configuration can be changed in /test/fixtures/project/config/database-*.yml
+Database-Configuration can be changed in `/test/fixtures/project/config/database-*.yml`
