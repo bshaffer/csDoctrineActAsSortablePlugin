@@ -7,10 +7,7 @@ before_script:
   - ./bin/travis-init.sh
   - "export SYMFONY=`pwd`/lib/vendor/symfony/lib/"
 
-script:
-  - php test/unit/SortableTest.php
-  - php test/unit/SortableBatchTest.php
-  - php test/unit/SortableUniqueByTest.php
+script: php test/bin/prove.php
 
 env:
  - DB=postgre SYMFONY_REF=origin/1.4
