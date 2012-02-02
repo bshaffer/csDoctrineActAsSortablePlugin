@@ -1,4 +1,8 @@
-echo "Cloning symfony"
+echo "Cloning symfony and checking out tag/branch/commit"
 git clone git://github.com/symfony/symfony1.git lib/vendor/symfony
 
-echo "exporting symfony ENV-Variable"
+cd lib/vendor/symfony
+
+git fetch --all
+
+git checkout $SYMFONY_REF
