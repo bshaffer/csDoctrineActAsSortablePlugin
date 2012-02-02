@@ -6,7 +6,7 @@ $t = new lime_test();
 
 $t->info('Create Sortable Sample Set');
 
-    Doctrine_Core::getTable('SortableArticle')
+    Doctrine::getTable('SortableArticle')
         ->createQuery()->delete()->execute();
     
     $a1 = new SortableArticle();
@@ -95,7 +95,7 @@ $t->info('Test deleting a collection of sortable items');
     $d4->name = 'Article To Delete 4';
     $d4->save();
     
-    $collection = Doctrine_Collection::create('SortableArticle');
+    $collection = new Doctrine_Collection('SortableArticle');
     $collection[] = $d1;
     $collection[] = $d2;
     $collection[] = $d3;

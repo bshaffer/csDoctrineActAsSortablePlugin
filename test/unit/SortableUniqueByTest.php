@@ -4,11 +4,11 @@ require_once dirname(__FILE__).'/../bootstrap/bootstrap.php';
 
 $t = new lime_test();
 
-$categories = Doctrine_Core::getTable('SortableArticleCategory')->findAll();
+$categories = Doctrine::getTable('SortableArticleCategory')->findAll();
 
 $t->info('Create Sortable Sample Set');
 
-    Doctrine_Core::getTable('SortableArticleUniqueBy')
+    Doctrine::getTable('SortableArticleUniqueBy')
         ->createQuery()->delete()->execute();
 
     $a1 = new SortableArticleUniqueBy();
@@ -59,8 +59,8 @@ $t->info('Test Removing an item - items after it should be promoted');
 
     $a2->delete(); doctrine_refresh($a1);
     $t->is($a1['position'], 1, '"First item" has been promoted to "1" from "2"');
-    
-    $a4->delete(); doctrine_refresh($a3);
+
+    $a4->delete(); doctrine_refresh($a3, $a5);
     $t->is($a3['position'], 1, '"Third item" has been promoted to "1" from "2"');
     $t->is($a5['position'], 2, '"Fifth item" has been promoted to "2" from "3"');
     
@@ -98,7 +98,7 @@ $t->info('Test deleting a collection of sortable items');
     $d4->Category = $categories[2];
     $d4->save();
     
-    $collection = Doctrine_Core::getTable('SortableArticleUniqueBy')
+    $collection = Doctrine::getTable('SortableArticleUniqueBy')
         ->createQuery()
         ->where('category_id = ?', $categories[2]['id'])
         ->execute();
