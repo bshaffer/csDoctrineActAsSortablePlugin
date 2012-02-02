@@ -128,3 +128,28 @@ In your module, edit `actions/actions.class.php`, Add the following actions:
       $object->demote();
       $this->redirect("@moduleIndexRoute");
     }
+    
+Running Unit Tests
+------------------
+
+First you have to set where the symfony library you'd like to run it against is located:
+
+    export SYMFONY=/usr/share/php/symfony
+
+(PEAR installed symfony on an Ubuntu/Debian-system)
+
+By default, this will run against a sqlite database.  If you'd like to run against postgres or mysql, 
+export the environmental `$DB` variable as follows:
+
+    # Running against mysql:
+    export DB=mysql; php ./test/bin/prove.php
+
+    #Running against postgre:
+    export DB=postgre; php ./test/bin/prove.php
+
+Database connection data:
+
+mySQL uses root with no password per default
+postgreSQL uses postgres with no password per default
+
+Database-Configuration can be changed in /test/fixtures/project/config/database-*.yml
