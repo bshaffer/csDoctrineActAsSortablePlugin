@@ -31,22 +31,36 @@ class sfPluginTestBootstrap
 
   public function setup()
   {
-    $config = $this->configuration->getPluginConfiguration('sfDoctrinePlugin')->getCliConfig();
-
-    //$this->databasemanager->loadConfiguration();
-
     $db = $this->databasemanager->getDatabase('doctrine');
     /* @var $db sfDoctrineDatabase */
 
-    try {
-        // ignore error if database does not yet exist (clean CI-env)
-        $db->getDoctrineConnection()->dropDatabase();
-    } catch (Exception $e) {
+    // Special Handling for postgre, since droping even when closing the connection, fails with
+    // SQLSTATE[55006]: Object in use: 7 ERROR:  database "cs_doctrine_act_as_sortable_test" is being accessed by other users DETAIL:  There are 1 other session(s) using the database.
+    if ($db->getDoctrineConnection() instanceof Doctrine_Connection_Pgsql) {
+        $export = new Doctrine_Export_Pgsql($db->getDoctrineConnection());
+        $import = new Doctrine_Import_Pgsql($db->getDoctrineConnection());
+        $tablenames = array(
+            SortableArticleTable::getInstance()->getTableName(),
+            SortableArticleUniqueByTable::getInstance()->getTableName(),
+            SortableArticleCategoryTable::getInstance()->getTableName()
+        );
+
+        foreach($tablenames as $tablename)
+        {
+            if ($import->tableExists($tablename)) {
+                $export->dropTable($tablename);
+            }
+        }
+    } else {
+        try {
+            // ignore error if database does not yet exist (clean CI-env)
+            $db->getDoctrineConnection()->dropDatabase();
+        } catch (Exception $e) {
+        }
+        $db->getDoctrineConnection()->createDatabase();
     }
-    $db->getDoctrineConnection()->createDatabase();
 
-
-    Doctrine_Core::loadModels($config['models_path'], Doctrine_Core::MODEL_LOADING_CONSERVATIVE);
+    Doctrine_Core::loadModels(dirname(__FILE__).'/../fixtures/project/lib/model/doctrine', Doctrine_Core::MODEL_LOADING_CONSERVATIVE);
     Doctrine_Core::createTablesFromArray(Doctrine_Core::getLoadedModels());
     Doctrine_Core::loadData(dirname(__FILE__).'/../fixtures/project/data/fixtures/categories.yml');
   }
@@ -148,7 +162,6 @@ class sfPluginTestBootstrap
     spl_autoload_register(array($this, 'autoload'));
     register_shutdown_function(array($this, 'teardown'));
 
-    // Cleanup and copy over SQLite DB
     $this->teardown();
     $this->setup();
   }
