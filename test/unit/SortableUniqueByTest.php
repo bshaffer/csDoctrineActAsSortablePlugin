@@ -4,11 +4,11 @@ require_once dirname(__FILE__).'/../bootstrap/bootstrap.php';
 
 $t = new lime_test();
 
-$categories = Doctrine_Core::getTable('SortableArticleCategory')->findAll();
+$categories = Doctrine::getTable('SortableArticleCategory')->findAll();
 
 $t->info('Create Sortable Sample Set');
 
-    Doctrine_Core::getTable('SortableArticleUniqueBy')
+    Doctrine::getTable('SortableArticleUniqueBy')
         ->createQuery()->delete()->execute();
 
     $a1 = new SortableArticleUniqueBy();
@@ -98,7 +98,7 @@ $t->info('Test deleting a collection of sortable items');
     $d4->Category = $categories[2];
     $d4->save();
     
-    $collection = Doctrine_Core::getTable('SortableArticleUniqueBy')
+    $collection = Doctrine::getTable('SortableArticleUniqueBy')
         ->createQuery()
         ->where('category_id = ?', $categories[2]['id'])
         ->execute();
