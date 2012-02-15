@@ -91,9 +91,10 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
    */
   private function refreshPosition(Doctrine_Record $object)
   {
+      $fieldName = $this->_options['name'];
       $identifiers = $object->getTable()->getIdentifierColumnNames();
 
-      $query = $object->getTable()->createQuery()->select($this->_options['name']);
+      $query = $object->getTable()->createQuery()->select($fieldName);
 
       foreach($identifiers as $identifier)
       {
@@ -101,7 +102,7 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
       }
 
       $position = $query->fetchOne(array(), Doctrine::HYDRATE_ARRAY);
-      $object->set($this->_options['name'], $position['position'], false);
+      $object->set($fieldName, $position[$fieldName], false);
   }
 
   /**
