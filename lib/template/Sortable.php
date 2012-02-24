@@ -195,7 +195,14 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
       foreach ($this->_options['uniqueBy'] as $field)
       {
-        $q->addWhere($field . ' = ?', $object[$field]);
+        if (!is_null($object[$field]))
+        {
+          $q->addWhere($field . ' = ?', $object[$field]);
+        }
+        else
+        {
+          $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $object[$field]);
+        }
       }
 
       // some drivers do not support UPDATE with ORDER BY query syntax
@@ -225,7 +232,14 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
       foreach($this->_options['uniqueBy'] as $field)
       {
-        $q->addWhere($field . ' = ?', $object[$field]);
+        if (!is_null($object[$field]))
+        {
+          $q->addWhere($field . ' = ?', $object[$field]);
+        }
+        else
+        {
+          $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $object[$field]);
+        }
       }
 
       // some drivers do not support UPDATE with ORDER BY query syntax
@@ -403,7 +417,14 @@ class Doctrine_Template_Sortable extends Doctrine_Template
       }
       else
       {
-        $q->addWhere($field . ' = ?', $object[$field]);
+        if (!is_null($object[$field]))
+        {
+          $q->addWhere($field . ' = ?', $object[$field]);
+        }
+        else
+        {
+          $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $object[$field]);
+        }
       }
     }
 
@@ -431,7 +452,14 @@ class Doctrine_Template_Sortable extends Doctrine_Template
       }
       else
       {
-        $q->addWhere($field . ' = ?', $object[$field]);
+        if (!is_null($object[$field]))
+        {
+          $q->addWhere($field . ' = ?', $object[$field]);
+        }
+        else
+        {
+          $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $object[$field]);
+        }
       }
     }
 
