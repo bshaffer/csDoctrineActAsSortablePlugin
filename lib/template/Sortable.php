@@ -195,13 +195,13 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
       foreach ($this->_options['uniqueBy'] as $field)
       {
-        if (!is_null($object[$field]))
+        if (is_null($object[$field]))
         {
-          $q->addWhere($field . ' = ?', $object[$field]);
+          $q->addWhere($field . ' IS NULL');
         }
         else
         {
-          $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $object[$field]);
+          $q->addWhere($field . ' = ?', $object[$field]);
         }
       }
 
@@ -232,13 +232,13 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
       foreach($this->_options['uniqueBy'] as $field)
       {
-        if (!is_null($object[$field]))
+        if (is_null($object[$field]))
         {
-          $q->addWhere($field . ' = ?', $object[$field]);
+          $q->addWhere($field . ' IS NULL');
         }
         else
         {
-          $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $object[$field]);
+          $q->addWhere($field . ' = ?', $object[$field]);
         }
       }
 
@@ -415,16 +415,13 @@ class Doctrine_Template_Sortable extends Doctrine_Template
       {
         $q->addWhere($field . ' = ?', $object[$field]['id']);
       }
+      elseif (is_null($object[$field])) 
+      {
+          $q->addWhere($field . ' IS NULL');
+      }
       else
       {
-        if (!is_null($object[$field]))
-        {
-          $q->addWhere($field . ' = ?', $object[$field]);
-        }
-        else
-        {
-          $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $object[$field]);
-        }
+        $q->addWhere($field . ' = ?', $object[$field]);
       }
     }
 
@@ -450,16 +447,13 @@ class Doctrine_Template_Sortable extends Doctrine_Template
       {
         $q->addWhere($field . ' = ?', $object[$field]['id']);
       }
+      elseif (is_null($object[$field])) 
+      {
+          $q->addWhere($field . ' IS NULL');
+      }
       else
       {
-        if (!is_null($object[$field]))
-        {
-          $q->addWhere($field . ' = ?', $object[$field]);
-        }
-        else
-        {
-          $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $object[$field]);
-        }
+        $q->addWhere($field . ' = ?', $object[$field]);
       }
     }
 
@@ -484,14 +478,13 @@ class Doctrine_Template_Sortable extends Doctrine_Template
 
    foreach($this->_options['uniqueBy'] as $field)
    {
-     $value = (is_object($object[$field])) ? $object[$field]['id'] : $object[$field];
-     if (!empty($value))
+     if (is_null($object[$field])) 
      {
-      $q->addWhere($field . ' = ?', $value);
+       $q->addWhere($field . ' IS NULL');
      }
      else
      {
-      $q->addWhere('(' . $field . ' = ? OR ' . $field . ' IS NULL)', $value);
+       $q->addWhere($field . ' = ?', $object[$field]);
      }
    }
 
