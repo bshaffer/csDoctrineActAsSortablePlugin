@@ -118,6 +118,13 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     $position  = $object->$fieldName;
     $conn      = $object->getTable()->getConnection();
 
+    // Quick fix forSoftDelete behavior
+    if ($object->getTable()->hasTemplate('SoftDelete'))
+    { 
+        $object->setPosition(null); 
+        $object->save(); 
+    } 
+
     // Create query to update other positions
     $q = $object->getTable()->createQuery()
                             ->where($fieldName . ' > ?', $position)
