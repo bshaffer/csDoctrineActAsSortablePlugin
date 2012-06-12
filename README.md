@@ -1,6 +1,8 @@
 csDoctrineActAsSortablePlugin
 =============================
 
+[![Build Status](https://secure.travis-ci.org/bshaffer/csDoctrineActAsSortablePlugin.png)](http://travis-ci.org/bshaffer/csDoctrineActAsSortablePlugin)
+
 The `csDoctrineActAsSortablePlugin` is a symfony plugin that allows use of the doctrine behavior actAsSortable.
 
 This behavior provides methods on your model for setting display order/position.
