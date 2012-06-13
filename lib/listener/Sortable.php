@@ -132,7 +132,14 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
 
     foreach ($this->_options['uniqueBy'] as $field)
     {
-      $q->addWhere($field . ' = ?', $object[$field]);
+      if(is_null($object[$field]))
+      {
+        $q->addWhere($field . ' IS NULL');
+      }
+      else
+      {
+        $q->addWhere($field . ' = ?', $object[$field]);
+      }
     }
 
     if ($this->canUpdateWithOrderBy($conn))
