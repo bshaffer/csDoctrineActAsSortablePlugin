@@ -158,6 +158,6 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     // query will throw exceptions when using this function
     return $conn->getTransactionLevel() < 2 &&
       // some drivers do not support UPDATE with ORDER BY query syntax
-      $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
+      $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite' && $conn->getDriverName() != 'Mssql';
   }
 }
