@@ -132,7 +132,14 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
 
     foreach ($this->_options['uniqueBy'] as $field)
     {
-      $q->addWhere($field . ' = ?', $object[$field]);
+      if(is_null($object[$field]))
+      {
+        $q->addWhere($field . ' IS NULL');
+      }
+      else
+      {
+        $q->addWhere($field . ' = ?', $object[$field]);
+      }
     }
 
     if ($this->canUpdateWithOrderBy($conn))
@@ -158,6 +165,6 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     // query will throw exceptions when using this function
     return $conn->getTransactionLevel() < 2 &&
       // some drivers do not support UPDATE with ORDER BY query syntax
-      $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite';
+      $conn->getDriverName() != 'Pgsql' && $conn->getDriverName() != 'Sqlite' && $conn->getDriverName() != 'Mssql';
   }
 }
