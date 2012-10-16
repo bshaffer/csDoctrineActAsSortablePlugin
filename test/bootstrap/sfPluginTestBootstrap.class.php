@@ -150,18 +150,35 @@ class sfPluginTestBootstrap
     require_once dirname(__FILE__).'/../fixtures/project/config/ProjectConfiguration.class.php';
 
     $dbms = 'sqlite';
-    if (isset($_SERVER['DB'])) {
+    if (isset($_SERVER['DB']))
+    {
         $dbms = strtolower($_SERVER['DB']);
     }
+    if (!isset($_SERVER['DSN']))
+    {
+        // Check if configuration for dbms exists
+        if (!file_exists(dirname(__FILE__).'/../fixtures/project/config/database-' . $dbms . '.yml'))
+        {
+            throw new Exception('Didnt find database-'.$dbms. 'yml for DBMS: "' . $dbms . '"');
+        }
 
-    // Check if configuration for dbms exists
-    if (!file_exists(dirname(__FILE__).'/../fixtures/project/config/database-' . $dbms . '.yml')) {
-        throw new Exception('Didnt find database-'.$dbms. 'yml for DBMS: "' . $dbms . '"');
+        copy(dirname(__FILE__).'/../fixtures/project/config/database-' . $dbms . '.yml',
+            dirname(__FILE__).'/../fixtures/project/config/databases.yml');
     }
-
-    copy(dirname(__FILE__).'/../fixtures/project/config/database-' . $dbms . '.yml',
-         dirname(__FILE__).'/../fixtures/project/config/databases.yml');
-
+    else
+    {
+        $databaseConfiguration = <<<EOT
+all:
+  doctrine:
+    class: sfDoctrineDatabase
+    param:
+      dsn: {$_SERVER['DSN']}
+EOT;
+        file_put_contents(
+            dirname(__FILE__).'/../fixtures/project/config/databases.yml',
+            $databaseConfiguration
+        );
+    }
     $this->configuration = ProjectConfiguration::getApplicationConfiguration($app, 'test', $debug);
 
     require_once $this->configuration->getSymfonyLibDir().'/vendor/lime/lime.php';
