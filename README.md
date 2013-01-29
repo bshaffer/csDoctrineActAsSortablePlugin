@@ -109,8 +109,8 @@ In your module, edit `config/generator.yml`, and under list, object actions, add
         action: promote
       demote:
         action: demote
-      _edit:        -
-      _delete:      -
+      _edit:        ~
+      _delete:      ~
           
 In your module, edit `actions/actions.class.php`, Add the following actions:
   
