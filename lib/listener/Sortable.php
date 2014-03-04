@@ -121,7 +121,7 @@ class Doctrine_Template_Listener_Sortable extends Doctrine_Record_Listener
     // Quick fix forSoftDelete behavior
     if ($object->getTable()->hasTemplate('SoftDelete'))
     { 
-        $object->setPosition(null); 
+        $object->set($fieldName, null); 
         $object->save(); 
     } 
 
