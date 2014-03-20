@@ -24,7 +24,7 @@ Installation
 
 In the editor that's displayed, add the following entry and then save
 
-    csDoctrineActAsSortablePlugin https://svn.github.com/bshaffer/csDoctrineActAsSortablePlugin.git
+    csDoctrineActAsSortablePlugin https://github.com/bshaffer/csDoctrineActAsSortablePlugin
 
 Finally, update:
 
