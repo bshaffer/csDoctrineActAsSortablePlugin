@@ -482,7 +482,7 @@ class Doctrine_Template_Sortable extends Doctrine_Template
      {
        $q->addWhere($field . ' = ?', $object[$field]['id']);
      }
-     if (is_null($object[$field])) 
+     elseif (is_null($object[$field]))
      {
        $q->addWhere($field . ' IS NULL');
      }
